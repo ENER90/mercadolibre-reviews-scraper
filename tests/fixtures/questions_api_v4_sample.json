@@ -1,0 +1,8 @@
+{"_note":"SYNTHETIC fixture modeled on the documented shape of GET https://api.mercadolibre.com/questions/search?item=...&api_version=4 (not captured live: requires an access token).",
+ "total":2,"limit":50,
+ "questions":[
+  {"id":13000000001,"seller_id":111,"text":"¿Sirve para iPhone?","status":"ANSWERED","item_id":"MLC467281714","date_created":"2026-09-01T10:00:00.000-04:00","deleted_from_listing":false,"hold":false,
+   "answer":{"text":"Hola, sí es compatible.","status":"ACTIVE","date_created":"2026-09-01T12:30:00.000-04:00"},
+   "from":{"id":222,"answered_questions":3}},
+  {"id":13000000002,"seller_id":111,"text":"¿Tiene garantía?","status":"UNANSWERED","item_id":"MLC467281714","date_created":"2026-09-05T09:00:00.000-04:00","answer":null,"from":{"id":333}}
+ ]}

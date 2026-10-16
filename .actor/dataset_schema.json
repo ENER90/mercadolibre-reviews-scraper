@@ -1,0 +1,3 @@
+{ "actorSpecification": 1, "fields": {},
+  "views": { "reviews": { "title": "Reviews & questions", "transformation": { "fields": ["type","siteId","country","objectId","title","reviewId","rating","text","date","likes","photoCount","questionId","question","questionDate","answer","answerDate"] },
+    "display": { "component": "table" } } } }

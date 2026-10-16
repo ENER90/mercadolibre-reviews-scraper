@@ -1,0 +1,2 @@
+{ "actorSpecification": 1, "name": "mercadolibre-reviews-questions", "title": "Mercado Libre Reviews & Questions Scraper", "version": "0.1", "buildTag": "latest",
+  "input": "./input_schema.json", "storages": { "dataset": "./dataset_schema.json" }, "dockerfile": "./Dockerfile" }

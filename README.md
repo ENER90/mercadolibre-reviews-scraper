@@ -1,1 +1,351 @@
-# mercadolibre-reviews-scraper
+# Mercado Libre Reviews & Questions Scraper
+
+[![Node.js](https://img.shields.io/badge/Node.js-20+-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.6+-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Crawlee](https://img.shields.io/badge/Crawlee-3.13+-FF4785?logo=apify&logoColor=white)](https://crawlee.dev/)
+[![Apify](https://img.shields.io/badge/Apify-3.2+-0F62FE?logo=apify&logoColor=white)](https://apify.com/)
+[![Vitest](https://img.shields.io/badge/Vitest-2.1+-6E9F18?logo=vitest&logoColor=white)](https://vitest.dev/)
+[![CI](https://github.com/rene-del-valle/ml-reviews-src/workflows/CI/badge.svg)](https://github.com/rene-del-valle/ml-reviews-src/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+---
+
+## 🇪🇸 Español
+
+### Descripción
+
+Actor de Apify que extrae **opiniones de productos** y, opcionalmente, **preguntas y respuestas** de Mercado Libre para Chile (MLC), Argentina (MLA), México (MLM), Colombia (MCO), Uruguay (MLU) y Perú (MPE).
+
+**Privacidad:** Este scraper **no almacena datos personales** (nombres, apodos o identificadores de usuarios que opinan o preguntan).
+
+### Características
+
+- ✅ Extracción de opiniones desde el endpoint JSON público de Mercado Libre
+- ✅ Soporte multi-país (CL, AR, MX, CO, UY, PE)
+- ✅ Paginación automática con reintentos (hasta 4 intentos)
+- ✅ Extracción opcional de preguntas y respuestas (requiere token de API oficial)
+- ✅ Compatible con proxies de Apify (recomendado: RESIDENTIAL para evitar bloqueos)
+- ✅ Respeto absoluto de la privacidad: sin datos de identidad
+
+### Stack Tecnológico
+
+- **Runtime:** Node.js 20+
+- **Lenguaje:** TypeScript 5.6+
+- **Framework de scraping:** Crawlee 3.13+
+- **Plataforma:** Apify 3.2+
+- **Testing:** Vitest 2.1+
+
+### Arquitectura
+
+```
+src/
+├── main.ts          # Orquestador principal con BasicCrawler de Crawlee
+└── parsers.ts       # Parsers de URLs, opiniones y preguntas
+tests/
+├── parsers.test.ts  # Tests unitarios
+└── fixtures/        # Fixtures JSON reales de Mercado Libre
+.actor/
+├── actor.json       # Configuración del Actor
+├── input_schema.json # Esquema de entrada
+└── dataset_schema.json # Esquema de salida
+```
+
+**Flujo:**
+1. El usuario provee URLs de productos/publicaciones o IDs numéricos
+2. El parser identifica el tipo (producto de catálogo `/p/MLC123` o publicación `MLC-123..._JM`)
+3. BasicCrawler extrae opiniones del endpoint público `/noindex/catalog/reviews/{id}/search` (20 por página)
+4. Opcionalmente, extrae preguntas desde la API oficial `api.mercadolibre.com/questions/search` (requiere token OAuth)
+5. Cada opinión o pregunta se guarda como una fila en el dataset de Apify
+
+### Entrada (Input)
+
+```json
+{
+  "startUrls": [
+    { "url": "https://www.mercadolibre.cl/.../p/MLC37981310" },
+    { "url": "https://articulo.mercadolibre.cl/MLC-467281714-..._JM" }
+  ],
+  "itemIds": ["MLC467281714", "MLA41149389"],
+  "country": "MLC",
+  "maxReviews": 100,
+  "includeQuestions": false,
+  "maxQuestions": 50,
+  "mlAccessToken": "",
+  "proxyConfiguration": { "useApifyProxy": true, "apifyProxyGroups": ["RESIDENTIAL"] }
+}
+```
+
+**Parámetros:**
+- `startUrls`: URLs de productos o publicaciones
+- `itemIds`: IDs numéricos (se asume `country` si no tienen prefijo)
+- `country`: Código del país por defecto (`MLC`, `MLA`, `MLM`, `MCO`, `MLU`, `MPE`)
+- `maxReviews`: Máximo de opiniones por producto (por defecto: 100)
+- `includeQuestions`: `true` para extraer preguntas (requiere `mlAccessToken`)
+- `maxQuestions`: Máximo de preguntas por publicación (por defecto: 50)
+- `mlAccessToken`: Token OAuth de [developers.mercadolibre.com](https://developers.mercadolibre.com/) (solo para preguntas)
+- `proxyConfiguration`: Configuración de proxy de Apify (recomendado: RESIDENTIAL)
+
+### Salida (Output)
+
+**Una fila por opinión:**
+```json
+{
+  "type": "review",
+  "siteId": "MLC",
+  "country": "Chile",
+  "objectId": "MLC37981310",
+  "isCatalogProduct": true,
+  "title": "Notebook HP 15.6 pulgadas",
+  "reviewId": 123456789,
+  "rating": 5,
+  "text": "Excelente producto, muy rápido",
+  "date": "2024-01-15T10:30:00.000Z",
+  "relativeDate": "hace 2 meses",
+  "likes": 3,
+  "photoCount": 2,
+  "variant": null
+}
+```
+
+**Una fila por pregunta:**
+```json
+{
+  "type": "question",
+  "siteId": "MLC",
+  "country": "Chile",
+  "objectId": "MLC467281714",
+  "questionId": 987654321,
+  "question": "¿Tiene garantía?",
+  "questionDate": "2024-01-10T14:20:00.000Z",
+  "status": "ANSWERED",
+  "answer": "Sí, 12 meses de garantía oficial",
+  "answerDate": "2024-01-11T09:15:00.000Z"
+}
+```
+
+### Nota sobre Preguntas
+
+Las **preguntas requieren un token de acceso de la API oficial de Mercado Libre** porque los endpoints web anónimos devuelven errores 403 o redirigen a verificación de cuenta. Las preguntas pertenecen a **publicaciones individuales** (`MLC-123..._JM`), no a productos de catálogo (`/p/MLC123`).
+
+### Cómo Ejecutar Localmente
+
+```bash
+# Instalar dependencias
+npm install
+
+# Ejecutar tests
+npm test
+
+# Compilar TypeScript
+npm run build
+
+# Ejecutar localmente (requiere INPUT.json en storage/key_value_stores/default/)
+npm start
+
+# O ejecutar con Apify CLI
+apify run
+```
+
+**Estructura de `storage/key_value_stores/default/INPUT.json`:**
+```json
+{
+  "startUrls": [{ "url": "https://www.mercadolibre.cl/.../p/MLC37981310" }],
+  "maxReviews": 50
+}
+```
+
+### CI/CD
+
+Este proyecto incluye un workflow de GitHub Actions que ejecuta:
+- `npm ci` (instalación de dependencias)
+- `npm run build` (compilación de TypeScript)
+- `npm test` (tests unitarios con Vitest)
+
+El CI se ejecuta en Node.js 20 en cada push y pull request.
+
+### Privacidad
+
+**Este scraper NO almacena:**
+- Nombres de usuarios
+- Apodos (nicknames)
+- IDs de usuarios
+- Correos electrónicos
+- Números de teléfono
+- Ningún dato de identidad personal
+
+El código filtra explícitamente estos campos para cumplir con las mejores prácticas de privacidad.
+
+### Licencia
+
+[MIT License](LICENSE) - René Del Valle Rodríguez
+
+---
+
+## 🇬🇧 English
+
+### Description
+
+Apify Actor that scrapes **product reviews** and optionally **questions & answers** from Mercado Libre for Chile (MLC), Argentina (MLA), Mexico (MLM), Colombia (MCO), Uruguay (MLU), and Peru (MPE).
+
+**Privacy:** This scraper **does not store personal data** (names, nicknames, or user identifiers of reviewers or askers).
+
+### Features
+
+- ✅ Review extraction from Mercado Libre's public JSON endpoint
+- ✅ Multi-country support (CL, AR, MX, CO, UY, PE)
+- ✅ Automatic pagination with retry logic (up to 4 attempts)
+- ✅ Optional Q&A extraction (requires official API token)
+- ✅ Apify proxy support (recommended: RESIDENTIAL to avoid blocks)
+- ✅ Full privacy respect: no identity data stored
+
+### Tech Stack
+
+- **Runtime:** Node.js 20+
+- **Language:** TypeScript 5.6+
+- **Scraping framework:** Crawlee 3.13+
+- **Platform:** Apify 3.2+
+- **Testing:** Vitest 2.1+
+
+### Architecture
+
+```
+src/
+├── main.ts          # Main orchestrator with Crawlee's BasicCrawler
+└── parsers.ts       # URL, review, and question parsers
+tests/
+├── parsers.test.ts  # Unit tests
+└── fixtures/        # Real JSON fixtures from Mercado Libre
+.actor/
+├── actor.json       # Actor configuration
+├── input_schema.json # Input schema
+└── dataset_schema.json # Output schema
+```
+
+**Flow:**
+1. User provides product/listing URLs or numeric IDs
+2. Parser identifies type (catalog product `/p/MLC123` or listing `MLC-123..._JM`)
+3. BasicCrawler extracts reviews from public endpoint `/noindex/catalog/reviews/{id}/search` (20 per page)
+4. Optionally extracts questions from official API `api.mercadolibre.com/questions/search` (requires OAuth token)
+5. Each review or question is saved as a row in Apify's dataset
+
+### Input
+
+```json
+{
+  "startUrls": [
+    { "url": "https://www.mercadolibre.cl/.../p/MLC37981310" },
+    { "url": "https://articulo.mercadolibre.cl/MLC-467281714-..._JM" }
+  ],
+  "itemIds": ["MLC467281714", "MLA41149389"],
+  "country": "MLC",
+  "maxReviews": 100,
+  "includeQuestions": false,
+  "maxQuestions": 50,
+  "mlAccessToken": "",
+  "proxyConfiguration": { "useApifyProxy": true, "apifyProxyGroups": ["RESIDENTIAL"] }
+}
+```
+
+**Parameters:**
+- `startUrls`: Product or listing URLs
+- `itemIds`: Numeric IDs (assumes `country` if no prefix)
+- `country`: Default country code (`MLC`, `MLA`, `MLM`, `MCO`, `MLU`, `MPE`)
+- `maxReviews`: Maximum reviews per product (default: 100)
+- `includeQuestions`: `true` to extract questions (requires `mlAccessToken`)
+- `maxQuestions`: Maximum questions per listing (default: 50)
+- `mlAccessToken`: OAuth token from [developers.mercadolibre.com](https://developers.mercadolibre.com/) (questions only)
+- `proxyConfiguration`: Apify proxy config (recommended: RESIDENTIAL)
+
+### Output
+
+**One row per review:**
+```json
+{
+  "type": "review",
+  "siteId": "MLC",
+  "country": "Chile",
+  "objectId": "MLC37981310",
+  "isCatalogProduct": true,
+  "title": "HP 15.6 inch Notebook",
+  "reviewId": 123456789,
+  "rating": 5,
+  "text": "Excellent product, very fast",
+  "date": "2024-01-15T10:30:00.000Z",
+  "relativeDate": "2 months ago",
+  "likes": 3,
+  "photoCount": 2,
+  "variant": null
+}
+```
+
+**One row per question:**
+```json
+{
+  "type": "question",
+  "siteId": "MLC",
+  "country": "Chile",
+  "objectId": "MLC467281714",
+  "questionId": 987654321,
+  "question": "Does it have warranty?",
+  "questionDate": "2024-01-10T14:20:00.000Z",
+  "status": "ANSWERED",
+  "answer": "Yes, 12 months official warranty",
+  "answerDate": "2024-01-11T09:15:00.000Z"
+}
+```
+
+### Note on Questions
+
+**Questions require an access token from Mercado Libre's official API** because anonymous web endpoints return 403 errors or redirect to account verification. Questions belong to **individual listings** (`MLC-123..._JM`), not catalog products (`/p/MLC123`).
+
+### How to Run Locally
+
+```bash
+# Install dependencies
+npm install
+
+# Run tests
+npm test
+
+# Compile TypeScript
+npm run build
+
+# Run locally (requires INPUT.json in storage/key_value_stores/default/)
+npm start
+
+# Or run with Apify CLI
+apify run
+```
+
+**`storage/key_value_stores/default/INPUT.json` structure:**
+```json
+{
+  "startUrls": [{ "url": "https://www.mercadolibre.cl/.../p/MLC37981310" }],
+  "maxReviews": 50
+}
+```
+
+### CI/CD
+
+This project includes a GitHub Actions workflow that runs:
+- `npm ci` (dependency installation)
+- `npm run build` (TypeScript compilation)
+- `npm test` (unit tests with Vitest)
+
+CI runs on Node.js 20 on every push and pull request.
+
+### Privacy
+
+**This scraper DOES NOT store:**
+- User names
+- Nicknames
+- User IDs
+- Email addresses
+- Phone numbers
+- Any personal identity data
+
+The code explicitly filters these fields to comply with privacy best practices.
+
+### License
+
+[MIT License](LICENSE) - René Del Valle Rodríguez

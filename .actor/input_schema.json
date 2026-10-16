@@ -1,0 +1,83 @@
+{
+  "title": "Mercado Libre Reviews & Questions",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "startUrls": {
+      "title": "Product / listing URLs",
+      "type": "array",
+      "editor": "requestListSources",
+      "description": "Catalog product URLs (…/p/MLC123) or listing URLs (articulo.mercadolibre.cl/MLC-123-…_JM).",
+      "prefill": [
+        {
+          "url": "https://www.mercadolibre.cl/audifonos-bluetooth-in-ear-tws-buds10-master-g/p/MLC37981310"
+        }
+      ]
+    },
+    "itemIds": {
+      "title": "Item / product IDs",
+      "type": "array",
+      "editor": "stringList",
+      "description": "IDs like MLC37981310 or MLA41149389. Bare numbers use the Country field."
+    },
+    "country": {
+      "title": "Default country (site)",
+      "type": "string",
+      "editor": "select",
+      "default": "MLC",
+      "enum": [
+        "MLC",
+        "MLA",
+        "MLM",
+        "MCO",
+        "MLU",
+        "MPE"
+      ],
+      "enumTitles": [
+        "Chile",
+        "Argentina",
+        "México",
+        "Colombia",
+        "Uruguay",
+        "Perú"
+      ],
+      "description": "Used only for bare numeric IDs."
+    },
+    "maxReviews": {
+      "title": "Max reviews per product",
+      "type": "integer",
+      "default": 100,
+      "minimum": 0,
+      "description": "Upper limit of reviews saved per product."
+    },
+    "includeQuestions": {
+      "title": "Include questions & answers",
+      "type": "boolean",
+      "default": false,
+      "description": "Requires an official Mercado Libre API access token (mlAccessToken)."
+    },
+    "maxQuestions": {
+      "title": "Max questions per listing",
+      "type": "integer",
+      "default": 50,
+      "minimum": 0,
+      "description": "Upper limit of questions saved per listing."
+    },
+    "mlAccessToken": {
+      "title": "Mercado Libre API access token",
+      "type": "string",
+      "isSecret": true,
+      "editor": "textfield",
+      "description": "OAuth token from developers.mercadolibre.com, needed only for questions."
+    },
+    "proxyConfiguration": {
+      "title": "Proxy",
+      "type": "object",
+      "editor": "proxy",
+      "default": {
+        "useApifyProxy": true
+      },
+      "description": "RESIDENTIAL proxies recommended if requests get blocked."
+    }
+  }
+}
