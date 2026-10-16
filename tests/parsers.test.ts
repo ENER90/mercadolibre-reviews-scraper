@@ -58,3 +58,33 @@ describe('parseQuestions', () => {
     expect(JSON.stringify(questions)).not.toMatch(/"from"|seller_id/);
   });
 });
+
+import { extractItemIds, questionsUrl, officialReviewsUrl, parseOfficialReviews, fetchAppToken } from '../src/parsers';
+describe('official API helpers', () => {
+  it('extracts listing ids from catalog reviews', () => {
+    expect(extractItemIds(fx('reviews_product_MLC37981310.json'), 'MLC')).toEqual(['MLC2551940624']);
+  });
+  it('builds questions/reviews urls', () => {
+    expect(questionsUrl('MLC1', 50)).toBe('https://api.mercadolibre.com/questions/search?item=MLC1&api_version=4&offset=50&limit=50');
+    expect(officialReviewsUrl('MLC1', 0, 20)).toBe('https://api.mercadolibre.com/reviews/item/MLC1?offset=0&limit=20');
+  });
+  it('question rows carry itemId and type', () => {
+    const { questions } = parseQuestions(fx('questions_api_v4_sample.json'), parseTarget('MLC467281714'));
+    for (const q of questions) { expect(q.type).toBe('question'); expect(q.itemId).toMatch(/^MLC\d+/); expect(q).not.toHaveProperty('from'); }
+  });
+  it('parses official reviews shape', () => {
+    const { reviews, total } = parseOfficialReviews({ paging: { total: 9 }, reviews: [{ id: 1, rate: 4, content: 'ok', date_created: '2026-01-01', likes: 2, reviewer_id: 99 }] }, parseTarget('MLC123456789'));
+    expect(total).toBe(9); expect(reviews[0]).toMatchObject({ reviewId: 1, rating: 4, text: 'ok', likes: 2 }); expect(JSON.stringify(reviews)).not.toMatch(/reviewer/);
+  });
+  it('fetchAppToken posts client_credentials and returns token', async () => {
+    let body = '';
+    const f: any = async (_u: string, o: any) => { body = o.body; return { ok: true, status: 200, json: async () => ({ access_token: 'APP_USR-x' }) }; };
+    expect(await fetchAppToken('id1', 's3cr3t', f)).toBe('APP_USR-x');
+    expect(body).toContain('grant_type=client_credentials');
+  });
+  it('fetchAppToken error does not leak the secret', async () => {
+    const f: any = async () => ({ ok: false, status: 400, json: async () => ({ error: 'invalid_client' }) });
+    await expect(fetchAppToken('id1', 's3cr3t', f)).rejects.toThrow(/invalid_client/);
+    await fetchAppToken('id1', 's3cr3t', f).catch((e) => expect(e.message).not.toContain('s3cr3t'));
+  });
+});

@@ -1,3 +1,34 @@
-{ "actorSpecification": 1, "fields": {},
-  "views": { "reviews": { "title": "Reviews & questions", "transformation": { "fields": ["type","siteId","country","objectId","title","reviewId","rating","text","date","likes","photoCount","questionId","question","questionDate","answer","answerDate"] },
-    "display": { "component": "table" } } } }
+{
+ "actorSpecification": 1,
+ "fields": {},
+ "views": {
+  "reviews": {
+   "title": "Reviews & questions",
+   "transformation": {
+    "fields": [
+     "type",
+     "siteId",
+     "country",
+     "objectId",
+     "title",
+     "reviewId",
+     "rating",
+     "text",
+     "date",
+     "likes",
+     "photoCount",
+     "itemId",
+     "questionId",
+     "question",
+     "questionDate",
+     "answer",
+     "answerDate",
+     "status"
+    ]
+   },
+   "display": {
+    "component": "table"
+   }
+  }
+ }
+}

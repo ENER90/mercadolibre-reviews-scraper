@@ -23,7 +23,7 @@ Actor de Apify que extrae **opiniones de productos** y, opcionalmente, **pregunt
 - ✅ Extracción de opiniones desde el endpoint JSON público de Mercado Libre
 - ✅ Soporte multi-país (CL, AR, MX, CO, UY, PE)
 - ✅ Paginación automática con reintentos (hasta 4 intentos)
-- ✅ Extracción opcional de preguntas y respuestas (requiere token de API oficial)
+- ✅ Extracción opcional de preguntas y respuestas (API oficial, con tu Client ID/Secret)
 - ✅ Compatible con proxies de Apify (recomendado: RESIDENTIAL para evitar bloqueos)
 - ✅ Respeto absoluto de la privacidad: sin datos de identidad
 
@@ -70,7 +70,9 @@ tests/
   "maxReviews": 100,
   "includeQuestions": false,
   "maxQuestions": 50,
-  "mlAccessToken": "",
+  "maxListingsPerProduct": 3,
+  "mlClientId": "TU_CLIENT_ID",
+  "mlClientSecret": "TU_SECRET_KEY",
   "proxyConfiguration": { "useApifyProxy": true, "apifyProxyGroups": ["RESIDENTIAL"] }
 }
 ```
@@ -80,9 +82,11 @@ tests/
 - `itemIds`: IDs numéricos (se asume `country` si no tienen prefijo)
 - `country`: Código del país por defecto (`MLC`, `MLA`, `MLM`, `MCO`, `MLU`, `MPE`)
 - `maxReviews`: Máximo de opiniones por producto (por defecto: 100)
-- `includeQuestions`: `true` para extraer preguntas (requiere `mlAccessToken`)
+- `includeQuestions`: `true` para extraer preguntas (requiere `mlClientId` + `mlClientSecret`)
 - `maxQuestions`: Máximo de preguntas por publicación (por defecto: 50)
-- `mlAccessToken`: Token OAuth de [developers.mercadolibre.com](https://developers.mercadolibre.com/) (solo para preguntas)
+- `maxListingsPerProduct`: para productos de catálogo, cuántas publicaciones encontradas en sus opiniones se consultan (por defecto: 3)
+- `mlClientId` / `mlClientSecret`: Client ID y Secret Key de tu app de Mercado Libre. El secreto es un input secreto (cifrado y nunca impreso en el log). El Actor obtiene el token solo, vía OAuth `client_credentials`
+- `mlAccessToken`: alternativa, un token OAuth ya generado (caduca a las 6 h)
 - `proxyConfiguration`: Configuración de proxy de Apify (recomendado: RESIDENTIAL)
 
 ### Salida (Output)
@@ -114,6 +118,7 @@ tests/
   "siteId": "MLC",
   "country": "Chile",
   "objectId": "MLC467281714",
+  "itemId": "MLC467281714",
   "questionId": 987654321,
   "question": "¿Tiene garantía?",
   "questionDate": "2024-01-10T14:20:00.000Z",
@@ -125,7 +130,14 @@ tests/
 
 ### Nota sobre Preguntas
 
-Las **preguntas requieren un token de acceso de la API oficial de Mercado Libre** porque los endpoints web anónimos devuelven errores 403 o redirigen a verificación de cuenta. Las preguntas pertenecen a **publicaciones individuales** (`MLC-123..._JM`), no a productos de catálogo (`/p/MLC123`).
+Las preguntas salen de la **API oficial** `api.mercadolibre.com/questions/search` (paginada con `limit`/`offset`). Los endpoints web anónimos devuelven 403 o piden verificación de cuenta. Las preguntas pertenecen a **publicaciones individuales** (`MLC-123..._JM`). Si entregas un producto de catálogo (`/p/MLC123`), el Actor detecta las publicaciones que aparecen en sus opiniones y consulta sus preguntas (hasta `maxListingsPerProduct`).
+
+Con credenciales, el Actor prueba primero la API oficial de opiniones (`/reviews/item/{id}`). Si tu app no tiene acceso (hoy responde 403 para apps normales), usa automáticamente el endpoint público.
+
+#### Cómo crear tu propia app de Mercado Libre (gratis)
+1. Entra a [developers.mercadolibre.com](https://developers.mercadolibre.com/), elige tu país, inicia sesión y ve a **Mis aplicaciones → Crear nueva aplicación**.
+2. Completa nombre, descripción y una *Redirect URI* con https (por ejemplo, la URL de tu GitHub). En **Permisos** basta con lectura de **Comunicaciones pre y post venta**. En flujos OAuth, marca **Client credentials** (y **Refresh token**).
+3. Guarda la app. Copia el **Client ID** y el **Secret Key** (menú ⋮ → Editar) en `mlClientId` y `mlClientSecret`.
 
 ### Cómo Ejecutar Localmente
 
@@ -194,7 +206,7 @@ Apify Actor that scrapes **product reviews** and optionally **questions & answer
 - ✅ Review extraction from Mercado Libre's public JSON endpoint
 - ✅ Multi-country support (CL, AR, MX, CO, UY, PE)
 - ✅ Automatic pagination with retry logic (up to 4 attempts)
-- ✅ Optional Q&A extraction (requires official API token)
+- ✅ Optional Q&A extraction (official API, with your Client ID/Secret)
 - ✅ Apify proxy support (recommended: RESIDENTIAL to avoid blocks)
 - ✅ Full privacy respect: no identity data stored
 
@@ -241,7 +253,9 @@ tests/
   "maxReviews": 100,
   "includeQuestions": false,
   "maxQuestions": 50,
-  "mlAccessToken": "",
+  "maxListingsPerProduct": 3,
+  "mlClientId": "YOUR_CLIENT_ID",
+  "mlClientSecret": "YOUR_SECRET_KEY",
   "proxyConfiguration": { "useApifyProxy": true, "apifyProxyGroups": ["RESIDENTIAL"] }
 }
 ```
@@ -251,9 +265,11 @@ tests/
 - `itemIds`: Numeric IDs (assumes `country` if no prefix)
 - `country`: Default country code (`MLC`, `MLA`, `MLM`, `MCO`, `MLU`, `MPE`)
 - `maxReviews`: Maximum reviews per product (default: 100)
-- `includeQuestions`: `true` to extract questions (requires `mlAccessToken`)
+- `includeQuestions`: `true` to extract questions (requires `mlClientId` + `mlClientSecret`)
 - `maxQuestions`: Maximum questions per listing (default: 50)
-- `mlAccessToken`: OAuth token from [developers.mercadolibre.com](https://developers.mercadolibre.com/) (questions only)
+- `maxListingsPerProduct`: for catalog products, how many seller listings found in the reviews are queried for questions (default: 3)
+- `mlClientId` / `mlClientSecret`: Client ID and Secret Key of your Mercado Libre app. The secret is a secret input (encrypted, never logged). The Actor gets the token itself via OAuth `client_credentials`
+- `mlAccessToken`: alternative, a ready OAuth token (expires after 6 h)
 - `proxyConfiguration`: Apify proxy config (recommended: RESIDENTIAL)
 
 ### Output
@@ -285,6 +301,7 @@ tests/
   "siteId": "MLC",
   "country": "Chile",
   "objectId": "MLC467281714",
+  "itemId": "MLC467281714",
   "questionId": 987654321,
   "question": "Does it have warranty?",
   "questionDate": "2024-01-10T14:20:00.000Z",
@@ -296,7 +313,14 @@ tests/
 
 ### Note on Questions
 
-**Questions require an access token from Mercado Libre's official API** because anonymous web endpoints return 403 errors or redirect to account verification. Questions belong to **individual listings** (`MLC-123..._JM`), not catalog products (`/p/MLC123`).
+Questions come from the **official API** `api.mercadolibre.com/questions/search` (paginated with `limit`/`offset`), because anonymous web endpoints return 403 or account verification. Questions belong to **individual listings** (`MLC-123..._JM`). For catalog products (`/p/MLC123`), the Actor detects the seller listings referenced in the product's reviews and fetches their questions (up to `maxListingsPerProduct`).
+
+With credentials, the Actor first tries the official reviews API (`/reviews/item/{id}`). If your app isn't authorized (it currently returns 403 for regular apps), it falls back to the public endpoint automatically.
+
+#### How to create your own Mercado Libre app (free)
+1. Go to [developers.mercadolibre.com](https://developers.mercadolibre.com/), pick your country, sign in and open **My applications → Create new application**.
+2. Fill in a name, a description and an https *Redirect URI* (for example, your GitHub URL). Under **Permissions**, read access to **pre/post-sale communications** is enough. Under OAuth flows, enable **Client credentials** (and **Refresh token**).
+3. Save it. Copy the **Client ID** and **Secret Key** (⋮ menu → Edit) into `mlClientId` and `mlClientSecret`.
 
 ### How to Run Locally
 

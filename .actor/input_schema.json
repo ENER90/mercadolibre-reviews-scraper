@@ -54,7 +54,7 @@
       "title": "Include questions & answers",
       "type": "boolean",
       "default": false,
-      "description": "Requires an official Mercado Libre API access token (mlAccessToken)."
+      "description": "Fetch questions & answers via the official Mercado Libre API. Needs mlClientId + mlClientSecret (your own free ML developer app) or mlAccessToken. For catalog products (/p/) the listings found in the reviews are used."
     },
     "maxQuestions": {
       "title": "Max questions per listing",
@@ -63,12 +63,32 @@
       "minimum": 0,
       "description": "Upper limit of questions saved per listing."
     },
+    "maxListingsPerProduct": {
+      "title": "Max listings per catalog product (questions)",
+      "type": "integer",
+      "default": 3,
+      "minimum": 0,
+      "description": "For catalog products (/p/), questions are fetched for up to this many seller listings found in the reviews."
+    },
+    "mlClientId": {
+      "title": "Mercado Libre app Client ID",
+      "type": "string",
+      "editor": "textfield",
+      "description": "Client ID (App ID) of your app at developers.mercadolibre.com. Used with mlClientSecret to get a token automatically (client_credentials)."
+    },
+    "mlClientSecret": {
+      "title": "Mercado Libre app Client Secret",
+      "type": "string",
+      "isSecret": true,
+      "editor": "textfield",
+      "description": "Secret Key of your Mercado Libre app. Stored encrypted, never logged."
+    },
     "mlAccessToken": {
       "title": "Mercado Libre API access token",
       "type": "string",
       "isSecret": true,
       "editor": "textfield",
-      "description": "OAuth token from developers.mercadolibre.com, needed only for questions."
+      "description": "Optional: a ready OAuth access token instead of Client ID/Secret (expires after 6 h)."
     },
     "proxyConfiguration": {
       "title": "Proxy",

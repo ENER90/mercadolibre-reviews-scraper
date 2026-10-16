@@ -69,7 +69,7 @@ export function parseReviews(json: any, t: Target): { reviews: ReviewRecord[]; e
 }
 
 export interface QuestionRecord {
-  type: 'question'; siteId: string; country: string; objectId: string; questionId: number | string; question: string | null;
+  type: 'question'; siteId: string; country: string; objectId: string; itemId: string; questionId: number | string; question: string | null;
   questionDate: string | null; status: string | null; answer: string | null; answerDate: string | null;
 }
 
@@ -80,8 +80,46 @@ export function parseQuestions(json: any, t: Target): { questions: QuestionRecor
     total: json.total ?? json.paging?.total ?? json.questions.length,
     questions: json.questions.map((q: any): QuestionRecord => ({
       type: 'question', siteId: t.siteId, country: SITES[t.siteId]?.name ?? t.siteId, objectId: t.objectId,
-      questionId: q.id, question: q.text ?? null, questionDate: q.date_created ?? null, status: q.status ?? null,
+      itemId: q.item_id ?? t.objectId, questionId: q.id, question: q.text ?? null, questionDate: q.date_created ?? null, status: q.status ?? null,
       answer: q.answer?.text ?? null, answerDate: q.answer?.date_created ?? null,
     })),
   };
+}
+
+/** Listing ids (MLC123…) referenced inside a catalog-product reviews payload (e.g. denounce URLs). */
+export function extractItemIds(json: any, siteId: string): string[] {
+  const re = new RegExp(`item_id=(${siteId}\\d{6,})`, 'g');
+  return [...new Set([...JSON.stringify(json ?? {}).matchAll(re)].map((m) => m[1]))];
+}
+
+export function questionsUrl(itemId: string, offset: number, limit = 50): string {
+  return `https://api.mercadolibre.com/questions/search?item=${itemId}&api_version=4&offset=${offset}&limit=${limit}`;
+}
+
+export function officialReviewsUrl(itemId: string, offset: number, limit: number): string {
+  return `https://api.mercadolibre.com/reviews/item/${itemId}?offset=${offset}&limit=${limit}`;
+}
+
+/** Parse official API /reviews/item/{id} (shape: { reviews: [{ id, rate, content, title, date_created, likes }], paging }). */
+export function parseOfficialReviews(json: any, t: Target): { reviews: ReviewRecord[]; total: number } {
+  if (!json || !Array.isArray(json.reviews)) throw new Error('Unexpected official reviews response shape.');
+  return {
+    total: json.paging?.total ?? json.reviews.length,
+    reviews: json.reviews.map((r: any): ReviewRecord => ({
+      type: 'review', siteId: t.siteId, country: SITES[t.siteId]?.name ?? t.siteId, objectId: t.objectId, isCatalogProduct: !t.isItem, title: t.title,
+      reviewId: r.id, rating: typeof r.rate === 'number' ? r.rate : null, text: r.content ?? null, date: r.date_created ?? null, relativeDate: null,
+      likes: typeof r.likes === 'number' ? r.likes : null, photoCount: Array.isArray(r.media) ? r.media.length : 0, variant: null,
+    })),
+  };
+}
+
+/** Token via OAuth client_credentials. Never logs the secret. */
+export async function fetchAppToken(clientId: string, clientSecret: string, fetchImpl: typeof fetch = fetch): Promise<string> {
+  const res = await fetchImpl('https://api.mercadolibre.com/oauth/token', {
+    method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded', accept: 'application/json' },
+    body: new URLSearchParams({ grant_type: 'client_credentials', client_id: clientId, client_secret: clientSecret }).toString(),
+  });
+  const j: any = await res.json().catch(() => ({}));
+  if (!res.ok || !j.access_token) throw new Error(`Mercado Libre OAuth failed (HTTP ${res.status}: ${j.error ?? j.message ?? 'unknown'}). Check mlClientId / mlClientSecret.`);
+  return j.access_token;
 }
