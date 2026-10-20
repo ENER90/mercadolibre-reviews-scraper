@@ -39,9 +39,9 @@ Usa `maxReviews` y `maxQuestions` para controlar el gasto. Use `maxReviews` / `m
 
 ## 🤖 AI insights (optional) / Análisis con IA (opcional)
 
-Turn on **AI insights** and paste your own **Gemini** key (free tier at [aistudio.google.com](https://aistudio.google.com/apikey)) or your **OpenAI** key. After scraping, the Actor adds one row per product with **sentiment %, top pros and cons, recurring complaints, feature requests, notable quotes and an executive summary**, so you get the main findings from 1,000 reviews in about a minute. Each `ai-insight` row counts as one normal result (US$0.001). The AI tokens are billed by your provider. It's off by default.
+Turn on **AI insights** and paste your own **Gemini** key (free tier at [aistudio.google.com](https://aistudio.google.com/apikey)) or your **OpenAI** key. After scraping, the Actor adds one row per product with **sentiment %, top pros and cons, recurring complaints, feature requests, notable quotes and an executive summary**, so you get the main findings from 1,000 reviews in about a minute. **AI add-on price: US$0.0002 per review analyzed (US$0.20 per 1,000), event `review-analyzed`, effective from 4 Nov 2026 (Apify's 14-day notice for new paid events). Until then it's free.** The `ai-insight` row itself also counts as one normal result. The AI tokens are billed by your own provider. It's off by default.
 
-Activa **AI insights** y pega tu key de **Gemini** o de **OpenAI**. Al terminar, el actor agrega una fila por producto con el **% de sentimiento, los pros y contras principales, las quejas que se repiten, lo que piden los clientes y un resumen ejecutivo**. La IA la cobra tu proveedor. Viene desactivado por defecto.
+Activa **AI insights** y pega tu key de **Gemini** o de **OpenAI**. Al terminar, el actor agrega una fila por producto con el **% de sentimiento, los pros y contras principales, las quejas que se repiten, lo que piden los clientes y un resumen ejecutivo**. Precio del add-on: US$0,0002 por reseña analizada (US$0,20 por 1.000), vigente desde el 4 nov 2026; hasta entonces es gratis. Los tokens de IA los cobra tu proveedor. Viene desactivado por defecto.
 
 ## ❓ FAQ
 

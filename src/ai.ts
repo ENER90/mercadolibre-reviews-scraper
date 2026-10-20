@@ -20,10 +20,16 @@ export async function runAiInsights(input: AiInput, source: string): Promise<num
   const llm = new LlmClient({ provider, apiKey: input.aiApiKey!, model, fallbackModels: provider === 'gemini' && !input.aiModel ? ['gemini-flash-lite-latest', 'gemini-3.5-flash-lite'] : [] }, 5);
   const reviews = dedupe(rows.map((r, i) => normalizeReview({ source, ...r }, i)).filter(Boolean) as any);
   let pushed = 0;
-  for (const [product, list] of groupByProduct(reviews, 'product')) {
+  const cm = Actor.getChargingManager();
+  const priced = 'review-analyzed' in cm.getPricingInfo().perEventPrices;
+  for (const [product, all] of groupByProduct(reviews, 'product')) {
+    let n = Math.min(all.length, 500);
+    if (priced) n = Math.min(n, cm.calculateMaxEventChargeCountWithinLimit('review-analyzed'));
+    if (n <= 0) { log.warning(`Max charge budget reached: skipping AI insight for "${product}".`); continue; }
+    const list = all.slice(0, n);
     try {
       const sentiments: any[] = []; const partials: any[] = [];
-      for (const b of chunk(list.slice(0, 500), 40)) {
+      for (const b of chunk(list, 40)) {
         const j = parseJson(await llm.json(batchPrompt(product, b, language, true)));
         for (const r of j.reviews ?? []) sentiments.push(r);
         const { reviews: _r, ...rest } = j; partials.push(rest);
@@ -31,6 +37,7 @@ export async function runAiInsights(input: AiInput, source: string): Promise<num
       const final = partials.length === 1 ? partials[0] : parseJson(await llm.json(reducePrompt(product, partials, language, list.length)));
       const row = buildInsight(product, list, sentiments, final, { model: llm.model, language });
       await Actor.pushData({ ...row, type: 'ai-insight', source }); // counts as one normal result row; no separate AI event yet
+      if (priced) await Actor.charge({ eventName: 'review-analyzed', count: list.length });
       pushed++; log.info(`AI insight saved for "${product}" (${list.length} reviews).`);
     } catch (e) { log.error(`AI insight failed for "${product}": ${(e as Error).message}`); }
   }
