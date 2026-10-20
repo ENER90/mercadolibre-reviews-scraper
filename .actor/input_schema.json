@@ -90,6 +90,47 @@
       "editor": "textfield",
       "description": "Optional: a ready OAuth access token instead of Client ID/Secret (expires after 6 h)."
     },
+    "aiInsights": {
+      "title": "AI insights per product (optional)",
+      "type": "boolean",
+      "default": false,
+      "sectionCaption": "🤖 AI insights (optional, bring your own key)",
+      "description": "Adds one 'ai-insight' row per product: sentiment %, top pros, cons, themes, feature requests, notable quotes and an executive summary. Requires your own Gemini or OpenAI API key (the AI cost is billed by your provider). Off by default."
+    },
+    "aiProvider": {
+      "title": "AI provider",
+      "type": "string",
+      "editor": "select",
+      "enum": [
+        "gemini",
+        "openai"
+      ],
+      "enumTitles": [
+        "Google Gemini",
+        "OpenAI"
+      ],
+      "description": "Leave empty to auto-detect from the key (Gemini keys start with 'AIza')."
+    },
+    "aiApiKey": {
+      "title": "AI API key",
+      "type": "string",
+      "editor": "textfield",
+      "isSecret": true,
+      "description": "Your Gemini (aistudio.google.com) or OpenAI key. Used only for the AI calls; stored encrypted and never logged."
+    },
+    "aiModel": {
+      "title": "AI model",
+      "type": "string",
+      "editor": "textfield",
+      "description": "Optional. Default: gemini-2.5-flash or gpt-4o-mini."
+    },
+    "aiLanguage": {
+      "title": "AI output language",
+      "type": "string",
+      "editor": "textfield",
+      "description": "Language of the AI text (e.g. English, Spanish, Portuguese).",
+      "default": "Spanish"
+    },
     "proxyConfiguration": {
       "title": "Proxy",
       "type": "object",

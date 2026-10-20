@@ -37,6 +37,12 @@ Usa `maxReviews` y `maxQuestions` para controlar el gasto. Use `maxReviews` / `m
 - **Agentes de IA / AI agents (MCP):** agrega el actor a tu servidor [Apify MCP](https://mcp.apify.com) (Claude, ChatGPT, Cursor…) y pídele "analiza las opiniones de este producto de Mercado Libre". Add it to the Apify MCP server and ask your agent to analyse a product's reviews.
 - **Exportar / Export:** JSON, CSV, Excel, XML desde el dataset / from the dataset.
 
+## 🤖 AI insights (optional) / Análisis con IA (opcional)
+
+Turn on **AI insights** and paste your own **Gemini** key (free tier at [aistudio.google.com](https://aistudio.google.com/apikey)) or your **OpenAI** key. After scraping, the Actor adds one row per product with **sentiment %, top pros and cons, recurring complaints, feature requests, notable quotes and an executive summary**, so you get the main findings from 1,000 reviews in about a minute. Each `ai-insight` row counts as one normal result (US$0.001). The AI tokens are billed by your provider. It's off by default.
+
+Activa **AI insights** y pega tu key de **Gemini** o de **OpenAI**. Al terminar, el actor agrega una fila por producto con el **% de sentimiento, los pros y contras principales, las quejas que se repiten, lo que piden los clientes y un resumen ejecutivo**. La IA la cobra tu proveedor. Viene desactivado por defecto.
+
 ## ❓ FAQ
 
 - **¿Necesito cuenta de Mercado Libre? / Do I need a Mercado Libre account?** No para opiniones. Para preguntas se necesita tu propia app gratuita (Client ID/Secret). Not for reviews; questions need your own free ML app credentials.
@@ -410,6 +416,17 @@ The code explicitly filters these fields to comply with privacy best practices.
 ### License
 
 [MIT License](LICENSE) - René Del Valle Rodríguez
+
+## 🔗 More scrapers by ener90 / Más scrapers de ener90
+
+- [Mercado Libre Price Tracker](https://apify.com/ener90/mercadolibre-seller-price-monitor) – monitor de precios de tiendas oficiales de Mercado Libre
+- [TrustRadius Reviews Scraper](https://apify.com/ener90/software-reviews-scraper) – reseñas de software B2B de TrustRadius
+- [Walmart Reviews Scraper](https://apify.com/ener90/walmart-products-reviews) – reseñas y productos de Walmart
+- [Product Hunt Scraper](https://apify.com/ener90/product-hunt-launches) – lanzamientos diarios de Product Hunt
+- Chile Real Estate Scraper (Portal Inmobiliario + TocToc) (`ener90/chile-real-estate-scraper`, coming soon / próximamente) – propiedades en venta y arriendo en Chile
+- AI Review Insights (`ener90/ai-review-insights`, coming soon / próximamente) – análisis de reseñas con IA
+
+Need a custom scraper or a different site? Open an issue in the **Issues** tab. / ¿Necesitas un scraper a medida? Escríbeme en la pestaña **Issues** (soporte en español).
 
 ## 🧩 API & integrations quick start
 

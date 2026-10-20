@@ -11,5 +11,6 @@
   "dockerfile": "./Dockerfile",
   "output": "./output_schema.json",
   "readme": "./STORE_README.md",
-  "changelog": "../CHANGELOG.md"
+  "changelog": "../CHANGELOG.md",
+  "description": "Extracts Mercado Libre product reviews (stars, text, date, photos) and answered questions in Chile, Argentina, Mexico, Colombia, Peru and Uruguay. Unofficial Mercado Libre reviews API: export opiniones y preguntas to JSON, CSV or Excel. No reviewer identity stored."
 }

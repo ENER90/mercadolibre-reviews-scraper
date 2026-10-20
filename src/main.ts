@@ -1,8 +1,9 @@
 import { Actor, log } from 'apify';
+import { aiEnabled, runAiInsights, AiInput } from './ai.js';
 import { BasicCrawler } from 'crawlee';
 import { parseTarget, reviewsUrl, parseReviews, parseQuestions, parseOfficialReviews, officialReviewsUrl, questionsUrl, extractItemIds, fetchAppToken, Target } from './parsers.js';
 
-interface Input {
+interface Input extends AiInput {
   startUrls?: { url: string }[]; itemIds?: string[]; country?: string; maxReviews?: number; includeQuestions?: boolean; maxQuestions?: number;
   mlClientId?: string; mlClientSecret?: string; mlAccessToken?: string; maxListingsPerProduct?: number; proxyConfiguration?: any;
 }
@@ -131,4 +132,5 @@ for (const t of targets) {
 await crawler.run(reqs);
 const nQ = [...qSeen.values()].reduce((a, b) => a + b, 0);
 log.info(`Done. Questions saved: ${nQ}.`);
+if (aiEnabled(input)) await runAiInsights({ aiLanguage: 'Spanish', ...input }, 'mercadolibre');
 await Actor.exit();
