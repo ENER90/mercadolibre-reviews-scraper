@@ -95,7 +95,7 @@
       "type": "boolean",
       "default": false,
       "sectionCaption": "🤖 AI insights (optional, bring your own key)",
-      "description": "Adds one 'ai-insight' row per product: sentiment %, top pros, cons, themes, feature requests, notable quotes and an executive summary. Requires your own Gemini or OpenAI API key. US$0.20 per 1,000 reviews analyzed from 4 Nov 2026 (free until then); AI tokens are billed by your provider. Off by default."
+      "description": "Adds one 'ai-insight' row per product: sentiment %, top pros, cons, themes, feature requests, notable quotes and an executive summary. Requires your own Gemini or OpenAI API key. US$0.20 per 1,000 reviews analyzed (only when AI insights are on); AI tokens are billed by your provider. Off by default."
     },
     "aiProvider": {
       "title": "AI provider",
