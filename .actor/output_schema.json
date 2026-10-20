@@ -1,0 +1,13 @@
+{
+  "actorOutputSchemaVersion": 1,
+  "title": "Mercado Libre reviews & questions output",
+  "description": "Reviews and (optionally) questions & answers are stored in the default dataset, one item per review or question.",
+  "properties": {
+    "results": {
+      "type": "string",
+      "title": "Reviews & questions",
+      "description": "All scraped reviews and questions (default dataset).",
+      "template": "{{links.apiDefaultDatasetUrl}}/items?view=reviews"
+    }
+  }
+}
