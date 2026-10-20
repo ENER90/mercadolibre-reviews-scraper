@@ -12,5 +12,5 @@
   "output": "./output_schema.json",
   "readme": "./STORE_README.md",
   "changelog": "../CHANGELOG.md",
-  "description": "Extracts Mercado Libre product reviews (stars, text, date, photos) and answered questions in Chile, Argentina, Mexico, Colombia, Peru and Uruguay. Unofficial Mercado Libre reviews API: export opiniones y preguntas to JSON, CSV or Excel. No reviewer identity stored. Optional AI insights with your own Gemini/OpenAI key: US$0.20 per 1,000 reviews analyzed."
+  "description": "Extracts Mercado Libre reviews (stars, text, date, photos) and answered questions in Chile, Argentina, Mexico, Colombia, Peru and Uruguay. Unofficial Mercado Libre reviews API: opiniones y preguntas to CSV, Excel or JSON. Optional AI insights (own Gemini/OpenAI key): US$0.20/1k reviews."
 }
