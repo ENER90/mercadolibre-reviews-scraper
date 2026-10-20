@@ -14,10 +14,10 @@ export function aiEnabled(input: AiInput): boolean {
 /** Runs map-reduce over the scraped review rows and pushes one `ai-insight` row per product. Never throws. */
 export async function runAiInsights(input: AiInput, source: string): Promise<number> {
   const rows = ((await (await Actor.openDataset()).getData({ limit: 100000 })).items as any[]).filter((r) => r.type === 'review');
-  const provider = input.aiProvider ?? (input.aiApiKey!.startsWith('AIza') ? 'gemini' : 'openai');
-  const model = input.aiModel || (provider === 'gemini' ? 'gemini-2.5-flash' : 'gpt-4o-mini');
+  const provider = input.aiProvider ?? ((input.aiApiKey!.startsWith('sk-') ? 'openai' : 'gemini'));
+  const model = input.aiModel || (provider === 'gemini' ? 'gemini-3.1-flash-lite' : 'gpt-4.1-mini');
   const language = input.aiLanguage || 'English';
-  const llm = new LlmClient({ provider, apiKey: input.aiApiKey!, model, fallbackModels: provider === 'gemini' && !input.aiModel ? ['gemini-2.5-flash-lite'] : [] }, 5);
+  const llm = new LlmClient({ provider, apiKey: input.aiApiKey!, model, fallbackModels: provider === 'gemini' && !input.aiModel ? ['gemini-flash-lite-latest', 'gemini-3.5-flash-lite'] : [] }, 5);
   const reviews = dedupe(rows.map((r, i) => normalizeReview({ source, ...r }, i)).filter(Boolean) as any);
   let pushed = 0;
   for (const [product, list] of groupByProduct(reviews, 'product')) {
