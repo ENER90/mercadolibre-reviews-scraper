@@ -1,7 +1,7 @@
 {
   "actorSpecification": 1,
   "name": "mercadolibre-reviews-questions",
-  "title": "Mercado Libre Reviews & Questions Scraper",
+  "title": "Mercado Libre Reviews & Preguntas Scraper",
   "version": "0.1",
   "buildTag": "latest",
   "input": "./input_schema.json",
@@ -12,5 +12,5 @@
   "output": "./output_schema.json",
   "readme": "./STORE_README.md",
   "changelog": "../CHANGELOG.md",
-  "description": "Extracts Mercado Libre reviews (stars, text, date, photos) and answered questions in Chile, Argentina, Mexico, Colombia, Peru and Uruguay. Unofficial Mercado Libre reviews API: opiniones y preguntas to CSV, Excel or JSON. Optional AI insights (own Gemini/OpenAI key): US$0.20/1k reviews."
+  "description": "Extrae opiniones (reviews) y preguntas de Mercado Libre en Chile, Argentina, México, Colombia, Perú y Uruguay: estrellas, texto, fecha y fotos. Exporta a Excel, CSV o JSON. Mercado Libre reviews & Q&A scraper API. IA opcional (tu key Gemini/OpenAI): US$0,20/1.000 reseñas."
 }

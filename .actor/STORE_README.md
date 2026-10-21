@@ -1,4 +1,4 @@
-# Mercado Libre Reviews & Questions Scraper
+# Mercado Libre Reviews & Preguntas Scraper – Opiniones API
 
 [![Node.js](https://img.shields.io/badge/Node.js-20+-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6+-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -7,21 +7,25 @@
 [![Vitest](https://img.shields.io/badge/Vitest-2.1+-6E9F18?logo=vitest&logoColor=white)](https://vitest.dev/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## 💲 Precio y costos / Pricing & cost examples
+🇪🇸 **Español** · 🇬🇧 [English](#english)
 
-Pago por resultado: **US$1 por 1.000 resultados** (cada opinión o pregunta es un resultado). Pay per result: **US$1 per 1,000 results**.
+Extrae las **opiniones** (estrellas, texto, fecha, fotos, likes) y las **preguntas y respuestas** de cualquier producto o publicación de **Mercado Libre** en Chile, Argentina, México, Colombia, Perú y Uruguay. Descarga todo a **Excel, CSV o JSON**, o consúmelo por API. Sin guardar datos personales de los compradores.
 
-| Ejemplo / Example | Resultados / Results | Costo aprox. / Approx. cost |
+## 💲 Precio y costos
+
+Pagas por resultado: **US$1 por cada 1.000 resultados** (cada opinión o pregunta cuenta como un resultado).
+
+| Ejemplo | Resultados | Costo aprox. |
 |---|---|---|
-| 1 producto, 100 opiniones / 1 product, 100 reviews | 100 | US$0.10 |
-| 20 productos × 50 opiniones / 20 products × 50 reviews | 1,000 | US$1.00 |
-| 100 productos × 100 opiniones + 20 preguntas c/u / 100 products × (100 reviews + 20 questions) | 12,000 | US$12.00 |
+| 1 producto con 100 opiniones | 100 | US$0,10 |
+| 20 productos × 50 opiniones | 1.000 | US$1,00 |
+| 100 productos × (100 opiniones + 20 preguntas) | 12.000 | US$12,00 |
 
-Usa `maxReviews` y `maxQuestions` para controlar el gasto. Use `maxReviews` / `maxQuestions` to cap spend.
+Con `maxReviews` y `maxQuestions` controlas cuánto gastas.
 
-## 🌎 Países soportados / Supported countries
+## 🌎 Países disponibles
 
-| Código / Code | País / Country | Dominio / Domain |
+| Código | País | Dominio |
 |---|---|---|
 | MLC | Chile | mercadolibre.cl |
 | MLA | Argentina | mercadolibre.com.ar |
@@ -30,30 +34,28 @@ Usa `maxReviews` y `maxQuestions` para controlar el gasto. Use `maxReviews` / `m
 | MLU | Uruguay | mercadolibre.com.uy |
 | MPE | Perú | mercadolibre.com.pe |
 
-## 🔌 Integraciones / Integrations
+## 🔌 Integraciones
 
-- **n8n / Make / Zapier:** usa el nodo o app oficial de Apify → "Run Actor" con `ener90/mercadolibre-reviews-questions` y luego "Get dataset items". Use the official Apify node/app → *Run Actor* → *Get dataset items*.
-- **API:** `POST https://api.apify.com/v2/acts/ener90~mercadolibre-reviews-questions/run-sync-get-dataset-items?token=<YOUR_TOKEN>` con el input JSON / with the JSON input.
-- **Agentes de IA / AI agents (MCP):** agrega el actor a tu servidor [Apify MCP](https://mcp.apify.com) (Claude, ChatGPT, Cursor…) y pídele "analiza las opiniones de este producto de Mercado Libre". Add it to the Apify MCP server and ask your agent to analyse a product's reviews.
-- **Exportar / Export:** JSON, CSV, Excel, XML desde el dataset / from the dataset.
+- **n8n / Make / Zapier:** usa el nodo o la app oficial de Apify → *Run Actor* con `ener90/mercadolibre-reviews-questions` y luego *Get dataset items*.
+- **API:** `POST https://api.apify.com/v2/acts/ener90~mercadolibre-reviews-questions/run-sync-get-dataset-items?token=<TU_TOKEN>` con el input en JSON.
+- **Agentes de IA (MCP):** agrega el actor a tu servidor [Apify MCP](https://mcp.apify.com) (Claude, ChatGPT, Cursor…) y pídele "analiza las opiniones de este producto de Mercado Libre".
+- **Exportar:** JSON, CSV, Excel o XML directo desde el dataset.
 
-## 🤖 AI insights (optional) / Análisis con IA (opcional)
+## 🤖 Análisis con IA (opcional)
 
-Turn on **AI insights** and paste your own **Gemini** key (free tier at [aistudio.google.com](https://aistudio.google.com/apikey)) or your **OpenAI** key. After scraping, the Actor adds one row per product with **sentiment %, top pros and cons, recurring complaints, feature requests, notable quotes and an executive summary**, so you get the main findings from 1,000 reviews in about a minute. **AI add-on price: US$0.0002 per review analyzed (US$0.20 per 1,000), event `review-analyzed`, effective 20 Oct 2026. Only charged when AI insights are on.** The `ai-insight` row itself also counts as one normal result. The AI tokens are billed by your own provider. It's off by default.
+Activa **AI insights** y pega tu propia key de **Gemini** (tiene plan gratis en [aistudio.google.com](https://aistudio.google.com/apikey)) o de **OpenAI**. Al terminar, el actor agrega una fila por producto con el **% de sentimiento, los pros y contras principales, las quejas que se repiten, lo que piden los clientes, citas destacadas y un resumen ejecutivo**: lo importante de 1.000 opiniones en más o menos un minuto.
 
-Activa **AI insights** y pega tu key de **Gemini** o de **OpenAI**. Al terminar, el actor agrega una fila por producto con el **% de sentimiento, los pros y contras principales, las quejas que se repiten, lo que piden los clientes y un resumen ejecutivo**. Precio del add-on: US$0,0002 por reseña analizada (US$0,20 por 1.000), vigente desde el 20 oct 2026; solo se cobra si activas el análisis con IA. Los tokens de IA los cobra tu proveedor. Viene desactivado por defecto.
+**Precio del add-on: US$0,0002 por opinión analizada (US$0,20 por 1.000), evento `review-analyzed`, vigente desde el 20 oct 2026. Solo se cobra si activas el análisis con IA.** La fila `ai-insight` cuenta además como un resultado normal. Los tokens de IA los cobra tu propio proveedor. Viene desactivado por defecto.
 
-## ❓ FAQ
+## ❓ Preguntas frecuentes
 
-- **¿Necesito cuenta de Mercado Libre? / Do I need a Mercado Libre account?** No para opiniones. Para preguntas se necesita tu propia app gratuita (Client ID/Secret). Not for reviews; questions need your own free ML app credentials.
-- **¿Guarda datos personales? / Does it store personal data?** No. No guarda nombres ni apodos de compradores. No reviewer or asker identity is stored.
-- **¿Funciona con URLs de catálogo (/p/) y de publicación? / Catalog and listing URLs?** Sí, ambas, y también IDs sueltos (MLC123…). Yes, both, plus raw IDs.
-- **¿Qué pasa si un producto no tiene opiniones? / No reviews?** El run termina bien y lo informa en el log, sin cobrar. The run succeeds and logs it; nothing is charged.
-- **¿Es legal? / Is it legal?** Extrae solo datos públicos y sin datos personales. Revisa los términos de Mercado Libre y las leyes de tu país para tu caso de uso. Only public, non-personal data is collected; check ML's terms and local law for your use case.
+- **¿Necesito cuenta de Mercado Libre?** Para las opiniones, no. Para las preguntas necesitas tu propia app gratuita de Mercado Libre (Client ID y Secret).
+- **¿Guarda datos personales?** No. No guarda nombres ni apodos de quienes opinan o preguntan.
+- **¿Funciona con URLs de catálogo (/p/) y de publicación?** Sí, con ambas, y también con IDs sueltos (MLC123…).
+- **¿Qué pasa si un producto no tiene opiniones?** La ejecución termina bien, lo informa en el log y no se cobra nada.
+- **¿Es legal?** Solo extrae datos públicos y sin datos personales. Revisa los términos de Mercado Libre y las leyes de tu país según tu caso de uso.
 
----
-
-## 🇪🇸 Español
+## 📖 Guía completa
 
 ### Descripción
 
@@ -234,9 +236,92 @@ El código filtra explícitamente estos campos para cumplir con las mejores prá
 
 [MIT License](LICENSE) - René Del Valle Rodríguez
 
+## 🔗 Más scrapers de ener90
+
+- [Mercado Libre Price Tracker](https://apify.com/ener90/mercadolibre-seller-price-monitor) – monitor de precios de tiendas oficiales de Mercado Libre
+- [TrustRadius Reviews Scraper](https://apify.com/ener90/software-reviews-scraper) – reseñas de software B2B de TrustRadius
+- [Walmart Reviews Scraper](https://apify.com/ener90/walmart-products-reviews) – reseñas y productos de Walmart
+- [Product Hunt Scraper](https://apify.com/ener90/product-hunt-launches) – lanzamientos diarios de Product Hunt
+- Chile Real Estate Scraper (Portal Inmobiliario + TocToc) (`ener90/chile-real-estate-scraper`, próximamente) – propiedades en venta y arriendo en Chile
+- AI Review Insights (`ener90/ai-review-insights`, próximamente) – análisis de reseñas con IA
+
+¿Necesitas un scraper a medida u otro sitio? Escríbeme en la pestaña **Issues** (soporte en español).
+
+## 🧩 API e integraciones: inicio rápido
+
+**cURL (síncrono, devuelve los resultados)**
+```bash
+curl -X POST "https://api.apify.com/v2/acts/ener90~mercadolibre-reviews-questions/run-sync-get-dataset-items?token=TU_TOKEN_APIFY" \
+  -H "Content-Type: application/json" -d '{"startUrls":[{"url":"https://www.mercadolibre.cl/.../p/MLC123"}],"maxReviews":100}'
+```
+
+**Node.js**
+```js
+import { ApifyClient } from 'apify-client';
+const client = new ApifyClient({ token: process.env.APIFY_TOKEN });
+const run = await client.actor('ener90/mercadolibre-reviews-questions').call({"startUrls":[{"url":"https://www.mercadolibre.cl/.../p/MLC123"}],"maxReviews":100});
+const { items } = await client.dataset(run.defaultDatasetId).listItems();
+```
+
+**Python**
+```python
+from apify_client import ApifyClient
+client = ApifyClient("TU_TOKEN_APIFY")
+run = client.actor("ener90/mercadolibre-reviews-questions").call(run_input={"startUrls":[{"url":"https://www.mercadolibre.cl/.../p/MLC123"}],"maxReviews":100})
+items = client.dataset(run["defaultDatasetId"]).list_items().items
+```
+
+- **Google Sheets:** agrega la integración *Google Sheets* a una Task guardada, o usa `=IMPORTDATA("https://api.apify.com/v2/datasets/<DATASET_ID>/items?format=csv&clean=1")`.
+- **n8n / Make / Zapier:** nodo o app oficial de Apify: *Run Actor* (`ener90/mercadolibre-reviews-questions`) → *Get dataset items*.
+- **Webhooks:** en una Task, agrega la integración *Run succeeded* → tu URL (recibe el `defaultDatasetId`).
+- **Agentes de IA (MCP):** `https://mcp.apify.com?actors=ener90/mercadolibre-reviews-questions` funciona en Claude, ChatGPT, Cursor o cualquier cliente MCP.
+- **Plan gratis:** funciona en el plan gratuito de Apify; se cobra por resultado (ver Precio). Parte con límites bajos para probar.
+
+## 📝 Historial de cambios
+- 0.1 (2026-10-19): primera versión pública; esquema de salida, README con precios, países y preguntas frecuentes; menos memoria por defecto (512 MB).
+
+¿Problemas o ideas? Abre un issue en la pestaña **Issues**; normalmente respondemos en menos de 24 h.
+
 ---
 
-## 🇬🇧 English
+## English
+
+Scrape Mercado Libre **reviews** (stars, text, date, photos, likes) and **questions & answers** for any product or listing in Chile, Argentina, Mexico, Colombia, Peru and Uruguay. Export to **Excel, CSV or JSON** or use the API. No buyer personal data is stored.
+
+### 💲 Pricing & cost examples
+
+Pay per result: **US$1 per 1,000 results** (each review or question is one result).
+
+| Example | Results | Approx. cost |
+|---|---|---|
+| 1 product, 100 reviews | 100 | US$0.10 |
+| 20 products × 50 reviews | 1,000 | US$1.00 |
+| 100 products × (100 reviews + 20 questions) | 12,000 | US$12.00 |
+
+Use `maxReviews` / `maxQuestions` to cap spend.
+
+### 🌎 Supported countries
+
+MLC Chile (mercadolibre.cl), MLA Argentina (mercadolibre.com.ar), MLM Mexico (mercadolibre.com.mx), MCO Colombia (mercadolibre.com.co), MLU Uruguay (mercadolibre.com.uy), MPE Peru (mercadolibre.com.pe).
+
+### 🔌 Integrations
+
+- **n8n / Make / Zapier:** use the official Apify node/app → *Run Actor* (`ener90/mercadolibre-reviews-questions`) → *Get dataset items*.
+- **API:** `POST https://api.apify.com/v2/acts/ener90~mercadolibre-reviews-questions/run-sync-get-dataset-items?token=<YOUR_TOKEN>` with the JSON input.
+- **AI agents (MCP):** add it to the [Apify MCP](https://mcp.apify.com) server and ask your agent to analyse a product's reviews.
+- **Export:** JSON, CSV, Excel, XML from the dataset.
+
+### 🤖 AI insights (optional)
+
+Turn on **AI insights** and paste your own **Gemini** key (free tier at [aistudio.google.com](https://aistudio.google.com/apikey)) or your **OpenAI** key. After scraping, the Actor adds one row per product with **sentiment %, top pros and cons, recurring complaints, feature requests, notable quotes and an executive summary**, so you get the main findings from 1,000 reviews in about a minute. **AI add-on price: US$0.0002 per review analyzed (US$0.20 per 1,000), event `review-analyzed`, effective 20 Oct 2026. Only charged when AI insights are on.** The `ai-insight` row itself also counts as one normal result. The AI tokens are billed by your own provider. It's off by default.
+
+### ❓ FAQ
+
+- **Do I need a Mercado Libre account?** Not for reviews; questions need your own free ML app credentials.
+- **Does it store personal data?** No reviewer or asker identity is stored.
+- **Catalog and listing URLs?** Yes, both, plus raw IDs.
+- **No reviews?** The run succeeds and logs it; nothing is charged.
+- **Is it legal?** Only public, non-personal data is collected; check ML's terms and local law for your use case.
 
 ### Description
 
@@ -417,18 +502,18 @@ The code explicitly filters these fields to comply with privacy best practices.
 
 [MIT License](LICENSE) - René Del Valle Rodríguez
 
-## 🔗 More scrapers by ener90 / Más scrapers de ener90
+### 🔗 More scrapers by ener90
 
-- [Mercado Libre Price Tracker](https://apify.com/ener90/mercadolibre-seller-price-monitor) – monitor de precios de tiendas oficiales de Mercado Libre
-- [TrustRadius Reviews Scraper](https://apify.com/ener90/software-reviews-scraper) – reseñas de software B2B de TrustRadius
-- [Walmart Reviews Scraper](https://apify.com/ener90/walmart-products-reviews) – reseñas y productos de Walmart
-- [Product Hunt Scraper](https://apify.com/ener90/product-hunt-launches) – lanzamientos diarios de Product Hunt
-- Chile Real Estate Scraper (Portal Inmobiliario + TocToc) (`ener90/chile-real-estate-scraper`, coming soon / próximamente) – propiedades en venta y arriendo en Chile
-- AI Review Insights (`ener90/ai-review-insights`, coming soon / próximamente) – análisis de reseñas con IA
+- [Mercado Libre Price Tracker](https://apify.com/ener90/mercadolibre-seller-price-monitor) – Mercado Libre official-store price monitor
+- [TrustRadius Reviews Scraper](https://apify.com/ener90/software-reviews-scraper) – B2B software reviews
+- [Walmart Reviews Scraper](https://apify.com/ener90/walmart-products-reviews) – Walmart reviews and products
+- [Product Hunt Scraper](https://apify.com/ener90/product-hunt-launches) – daily Product Hunt launches
+- Chile Real Estate Scraper (`ener90/chile-real-estate-scraper`, coming soon)
+- AI Review Insights (`ener90/ai-review-insights`, coming soon)
 
-Need a custom scraper or a different site? Open an issue in the **Issues** tab. / ¿Necesitas un scraper a medida? Escríbeme en la pestaña **Issues** (soporte en español).
+Need a custom scraper or a different site? Open an issue in the **Issues** tab.
 
-## 🧩 API & integrations quick start
+### 🧩 API & integrations quick start
 
 **cURL (sync, returns items)**
 ```bash
@@ -458,7 +543,7 @@ items = client.dataset(run["defaultDatasetId"]).list_items().items
 - **AI agents (MCP):** `https://mcp.apify.com?actors=ener90/mercadolibre-reviews-questions` works in Claude, ChatGPT, Cursor or any MCP client.
 - **Free plan:** works on Apify's free tier; usage is billed per result (see Pricing). Start with small limits to try it out.
 
-## 📝 Changelog
+### 📝 Changelog
 - 0.1 (2026-10-19): first public release; output schema, README with pricing, countries, FAQ; lower default memory (512 MB).
 
 Issues or ideas? Open an issue in the **Issues** tab and we usually reply within 24 h.
