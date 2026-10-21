@@ -1,28 +1,47 @@
 import { Actor, log } from 'apify';
 import { aiEnabled, runAiInsights, AiInput } from './ai.js';
 import { BasicCrawler } from 'crawlee';
-import { parseTarget, reviewsUrl, parseReviews, parseQuestions, parseOfficialReviews, officialReviewsUrl, questionsUrl, extractItemIds, fetchAppToken, Target } from './parsers.js';
+import { SITES, parseTarget, reviewsUrl, parseReviews, parseQuestions, parseOfficialReviews, officialReviewsUrl, questionsUrl, extractItemIds, fetchAppToken, Target } from './parsers.js';
 
 interface Input extends AiInput {
   startUrls?: { url: string }[]; itemIds?: string[]; country?: string; maxReviews?: number; includeQuestions?: boolean; maxQuestions?: number;
   mlClientId?: string; mlClientSecret?: string; mlAccessToken?: string; maxListingsPerProduct?: number; proxyConfiguration?: any;
 }
 const PAGE = 20;
+const safeJson = (b: string): any => { try { return JSON.parse(b); } catch { throw new Error('Non-JSON response from Mercado Libre API.'); } };
 const QPAGE = 50;
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36';
 
 await Actor.init();
 const input = (await Actor.getInput<Input>()) ?? {};
-const country = (input.country ?? 'MLC').toUpperCase();
-const maxReviews = input.maxReviews ?? 100;
-const maxQuestions = input.maxQuestions ?? 50;
-const maxListings = input.maxListingsPerProduct ?? 3;
-const raw = [...(input.startUrls ?? []).map((u) => u.url), ...(input.itemIds ?? [])];
-if (!raw.length) throw new Error('Input error: provide at least one product URL in "startUrls" or an id in "itemIds".');
+const country = String(input.country || 'MLC').trim().toUpperCase();
+const num = (v: any, d: number) => (Number.isFinite(Number(v)) && Number(v) >= 0 ? Math.floor(Number(v)) : d);
+const maxReviews = num(input.maxReviews, 100);
+const maxQuestions = num(input.maxQuestions, 50);
+const maxListings = num(input.maxListingsPerProduct, 3);
+const EXAMPLE = 'https://www.mercadolibre.cl/audifonos-bluetooth-in-ear-tws-buds10-master-g/p/MLC37981310';
+const toStr = (u: any): string => (typeof u === 'string' ? u : (u && typeof u === 'object' && typeof u.url === 'string' ? u.url : '')).trim();
+let raw = [...(Array.isArray(input.startUrls) ? input.startUrls : []).map(toStr), ...(Array.isArray(input.itemIds) ? input.itemIds : []).map(toStr)].filter(Boolean);
+if (!raw.length) {
+  log.warning(`No "startUrls" or "itemIds" given. Running a small demo with the example product ${EXAMPLE}. Add your own product URLs or IDs to scrape them.`);
+  raw = [EXAMPLE];
+}
 
 const targets: Target[] = [];
-for (const r of raw) { try { targets.push(parseTarget(r, country)); } catch (e) { log.error((e as Error).message); } }
-if (!targets.length) throw new Error('None of the given URLs/IDs could be parsed. See errors above.');
+const inputErrors: { type: 'error'; input: string; error: string }[] = [];
+for (const r of raw) {
+  try {
+    const t = parseTarget(r, country);
+    if (!SITES[t.siteId]) throw new Error(`Unsupported country/site "${t.siteId}" in "${r}". Supported: ${Object.keys(SITES).join(', ')}.`);
+    targets.push(t);
+  } catch (e) { log.error((e as Error).message); inputErrors.push({ type: 'error', input: r, error: (e as Error).message }); }
+}
+if (inputErrors.length) await Actor.pushData(inputErrors);
+if (!targets.length) {
+  const msg = 'None of the given URLs/IDs could be recognised as Mercado Libre products. Use a URL like https://www.mercadolibre.cl/.../p/MLC123 or https://articulo.mercadolibre.cl/MLC-123456789-..._JM, or an id like MLC123456789.';
+  log.error(msg);
+  await Actor.exit({ statusMessage: msg });
+}
 
 // ---- Official API token (client_credentials) ----
 let token: string | undefined = input.mlAccessToken?.trim() || undefined;
@@ -61,7 +80,8 @@ const crawler = new BasicCrawler({
       const res = await sendRequest({ url: request.url, headers: { 'user-agent': UA, accept: 'application/json' }, proxyUrl: await proxyConfiguration?.newUrl(), responseType: 'text' } as any);
       if (res.statusCode === 403 || /account-verification|suspicious-traffic/.test(res.url)) throw new Error(`Blocked by Mercado Libre anti-bot (HTTP ${res.statusCode}) for ${t.objectId}. Try Apify RESIDENTIAL proxy.`);
       if (res.statusCode >= 400) throw new Error(`HTTP ${res.statusCode} for ${request.url}`);
-      const json = JSON.parse(res.body);
+      let json: any;
+      try { json = JSON.parse(res.body); } catch { throw new Error(`Non-JSON reviews response for ${t.objectId} (HTTP ${res.statusCode}); probably blocked. Try Apify RESIDENTIAL proxy.`); }
       const { reviews, emptyMessage } = parseReviews(json, t);
       const done = seen.get(t.objectId) ?? 0;
       const take = reviews.slice(0, Math.max(0, maxReviews - done));
@@ -93,7 +113,7 @@ const crawler = new BasicCrawler({
         await c.addRequests([{ url: reviewsUrl(t, offset, PAGE), label: 'REVIEWS', userData: { target: t, offset } }]);
         return;
       }
-      const { reviews, total } = parseOfficialReviews(JSON.parse(res.body), t);
+      const { reviews, total } = parseOfficialReviews(safeJson(res.body), t);
       const done = seen.get(t.objectId) ?? 0;
       const take = reviews.slice(0, Math.max(0, maxReviews - done));
       if (take.length) await Actor.pushData(take);
@@ -108,7 +128,7 @@ const crawler = new BasicCrawler({
       const res = await sendRequest({ url: request.url, headers: auth(), responseType: 'text' } as any);
       if (res.statusCode === 401 || res.statusCode === 403) { log.error(`Questions for ${itemId}: HTTP ${res.statusCode}. Check your Mercado Libre credentials.`); return; }
       if (res.statusCode >= 400) throw new Error(`HTTP ${res.statusCode} for questions ${itemId}`);
-      const { questions, total } = parseQuestions(JSON.parse(res.body), t);
+      const { questions, total } = parseQuestions(safeJson(res.body), t);
       const done = qSeen.get(itemId) ?? 0;
       const take = questions.slice(0, Math.max(0, maxQuestions - done));
       if (take.length) await Actor.pushData(take);
@@ -132,5 +152,5 @@ for (const t of targets) {
 await crawler.run(reqs);
 const nQ = [...qSeen.values()].reduce((a, b) => a + b, 0);
 log.info(`Done. Questions saved: ${nQ}.`);
-if (aiEnabled(input)) await runAiInsights({ aiLanguage: 'Spanish', ...input }, 'mercadolibre');
+if (aiEnabled(input)) try { await runAiInsights({ aiLanguage: 'Spanish', ...input }, 'mercadolibre'); } catch (e) { log.error(`AI insights failed: ${(e as Error).message}`); }
 await Actor.exit();

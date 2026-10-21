@@ -5,6 +5,8 @@ export const SITES: Record<string, { domain: string; name: string }> = {
   MCO: { domain: 'www.mercadolibre.com.co', name: 'Colombia' },
   MLU: { domain: 'www.mercadolibre.com.uy', name: 'Uruguay' },
   MPE: { domain: 'www.mercadolibre.com.pe', name: 'Perú' },
+  MLB: { domain: 'www.mercadolivre.com.br', name: 'Brasil' },
+  MEC: { domain: 'www.mercadolibre.com.ec', name: 'Ecuador' },
 };
 
 export interface Target { siteId: string; objectId: string; isItem: boolean; title: string | null; sourceUrl: string | null }
@@ -14,9 +16,11 @@ export function parseTarget(input: string, defaultCountry = 'MLC'): Target {
   const s = input.trim();
   if (!s) throw new Error('Empty URL/ID in input.');
   const isUrl = /^https?:\/\//i.test(s);
-  let m = s.match(/\/p\/([A-Z]{3})(\d{5,})/);
+  let m = s.match(/\/p\/([A-Za-z]{3})(\d{5,})/);
+  if (m) m = [m[0], m[1].toUpperCase(), m[2]] as any;
   if (m) return { siteId: m[1], objectId: m[1] + m[2], isItem: false, title: slugTitle(s, /\/([^/]+)\/p\//), sourceUrl: s };
-  m = s.match(/([A-Z]{3})-(\d{6,})(?:-([^?#]*?))?(?:-_JM|[?#]|$)/);
+  if (/\/up\/[A-Z]{3}U\d+/i.test(s)) throw new Error(`"${s}" is a user-product page (/up/...), which has no public reviews id. Open the listing and copy its URL (…/MLC-123456789-…_JM) or the catalog URL (…/p/MLC123).`);
+  m = s.match(/(?<![A-Za-z])([A-Z]{3})-?(\d{6,})(?:-([^?#/]*?))?(?:-_JM|[?#/]|$)/);
   if (m) return { siteId: m[1], objectId: m[1] + m[2], isItem: true, title: m[3] ? cleanSlug(m[3]) : null, sourceUrl: isUrl ? s : null };
   m = s.match(/^([A-Z]{3})(\d{6,})$/i);
   if (m) {
