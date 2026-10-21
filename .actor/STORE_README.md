@@ -2,6 +2,10 @@
 
 Saca las opiniones y las preguntas de cualquier producto de Mercado Libre en Chile, Argentina, México, Colombia, Perú y Uruguay, y te las deja en una tabla lista para Excel, CSV, JSON o Google Sheets. Lo hice porque necesitaba leer lo que decían los compradores de varios productos sin copiar opiniones a mano.
 
+Si prefieres verlo funcionando antes de probarlo, grabé un tutorial corto en video:
+
+https://www.youtube.com/watch?v=gTivXLYODZY
+
 No guarda nombres ni apodos de quienes opinan o preguntan.
 
 ![Formulario de entrada con la URL de un producto](https://raw.githubusercontent.com/ENER90/mercadolibre-reviews-scraper/main/docs/screenshots/01-input.png)
