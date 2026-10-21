@@ -18,7 +18,10 @@
       "title": "Item / product IDs",
       "type": "array",
       "editor": "stringList",
-      "description": "IDs like MLC37981310 or MLA41149389. Bare numbers use the Country field."
+      "description": "IDs like MLC37981310 or MLA41149389. Bare numbers use the Country field.",
+      "example": [
+        "MLC37981310"
+      ]
     },
     "country": {
       "title": "Default country (site)",
@@ -41,40 +44,46 @@
         "Uruguay",
         "Perú"
       ],
-      "description": "Used only for bare numeric IDs."
+      "description": "Used only for bare numeric IDs.",
+      "prefill": "MLC"
     },
     "maxReviews": {
       "title": "Max reviews per product",
       "type": "integer",
       "default": 100,
       "minimum": 0,
-      "description": "Upper limit of reviews saved per product."
+      "description": "Upper limit of reviews saved per product.",
+      "prefill": 100
     },
     "includeQuestions": {
       "title": "Include questions & answers",
       "type": "boolean",
       "default": false,
-      "description": "Fetch questions & answers via the official Mercado Libre API. Needs mlClientId + mlClientSecret (your own free ML developer app) or mlAccessToken. For catalog products (/p/) the listings found in the reviews are used."
+      "description": "Fetch questions & answers via the official Mercado Libre API. Needs mlClientId + mlClientSecret (your own free ML developer app) or mlAccessToken. For catalog products (/p/) the listings found in the reviews are used.",
+      "prefill": false
     },
     "maxQuestions": {
       "title": "Max questions per listing",
       "type": "integer",
       "default": 50,
       "minimum": 0,
-      "description": "Upper limit of questions saved per listing."
+      "description": "Upper limit of questions saved per listing.",
+      "prefill": 50
     },
     "maxListingsPerProduct": {
       "title": "Max listings per catalog product (questions)",
       "type": "integer",
       "default": 3,
       "minimum": 0,
-      "description": "For catalog products (/p/), questions are fetched for up to this many seller listings found in the reviews."
+      "description": "For catalog products (/p/), questions are fetched for up to this many seller listings found in the reviews.",
+      "prefill": 3
     },
     "mlClientId": {
       "title": "Mercado Libre app Client ID",
       "type": "string",
       "editor": "textfield",
-      "description": "Client ID (App ID) of your app at developers.mercadolibre.com. Used with mlClientSecret to get a token automatically (client_credentials)."
+      "description": "Client ID (App ID) of your app at developers.mercadolibre.com. Used with mlClientSecret to get a token automatically (client_credentials).",
+      "example": "1234567890123456"
     },
     "mlClientSecret": {
       "title": "Mercado Libre app Client Secret",
@@ -94,8 +103,9 @@
       "title": "AI insights per product (optional)",
       "type": "boolean",
       "default": false,
-      "sectionCaption": "🤖 AI insights (optional, bring your own key)",
-      "description": "Adds one 'ai-insight' row per product: sentiment %, top pros, cons, themes, feature requests, notable quotes and an executive summary. Requires your own Gemini or OpenAI API key. US$0.20 per 1,000 reviews analyzed (only when AI insights are on); AI tokens are billed by your provider. Off by default."
+      "sectionCaption": "AI insights (optional, bring your own key)",
+      "description": "Adds one 'ai-insight' row per product: sentiment %, top pros, cons, themes, feature requests, notable quotes and an executive summary. Requires your own Gemini or OpenAI API key. US$0.20 per 1,000 reviews analyzed (only when AI insights are on); AI tokens are billed by your provider. Off by default.",
+      "prefill": false
     },
     "aiProvider": {
       "title": "AI provider",
@@ -109,7 +119,8 @@
         "Google Gemini",
         "OpenAI"
       ],
-      "description": "Leave empty to auto-detect from the key (keys starting with 'sk-' are OpenAI, others Gemini)."
+      "description": "Leave empty to auto-detect from the key (keys starting with 'sk-' are OpenAI, others Gemini).",
+      "example": "gemini"
     },
     "aiApiKey": {
       "title": "AI API key",
@@ -122,14 +133,16 @@
       "title": "AI model",
       "type": "string",
       "editor": "textfield",
-      "description": "Optional. Default: gemini-3.1-flash-lite or gpt-4.1-mini."
+      "description": "Optional. Default: gemini-3.1-flash-lite or gpt-4.1-mini.",
+      "example": "gemini-3.1-flash-lite"
     },
     "aiLanguage": {
       "title": "AI output language",
       "type": "string",
       "editor": "textfield",
       "description": "Language of the AI text (e.g. English, Spanish, Portuguese).",
-      "default": "Spanish"
+      "default": "Spanish",
+      "prefill": "Spanish"
     },
     "proxyConfiguration": {
       "title": "Proxy",
@@ -138,7 +151,11 @@
       "default": {
         "useApifyProxy": true
       },
-      "description": "RESIDENTIAL proxies recommended if requests get blocked."
+      "description": "RESIDENTIAL proxies recommended if requests get blocked.",
+      "prefill": {
+        "useApifyProxy": true
+      }
     }
-  }
+  },
+  "description": "Pega la URL de un producto de Mercado Libre (o su ID), elige cuántas opiniones quieres y aprieta Start. Las preguntas y el resumen con IA son opcionales."
 }
